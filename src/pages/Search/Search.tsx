@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Input } from "@/components/ui/input";
 import type { AuthContext } from "@/hooks/useAuth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import DOMPurify from "dompurify";
 
 import { useRouteContext } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
@@ -42,8 +43,11 @@ function Search() {
   );
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setInputText(event.target.value);
-    debouncedSave(event.target.value);
+    const clean = DOMPurify.sanitize(event.target.value);
+
+    if (clean === inputText) return;
+    setInputText(clean);
+    debouncedSave(clean);
   };
 
   console.log(debouncedInputText);
