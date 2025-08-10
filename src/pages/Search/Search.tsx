@@ -6,8 +6,11 @@ import DOMPurify from "dompurify";
 
 import { useRouteContext } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
-import SkeletonSearch from "./SkeletonSearch";
+import SkeletonSearch from "./components/SkeletonSearch";
 import debounce from "@/helpers/debouncer";
+import NoDataSearch from "./components/NoDataSearch";
+import { Scroll } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 async function fetchPosts(
   context: { authContext?: AuthContext },
@@ -67,8 +70,8 @@ function Search() {
 
   return (
     <>
-      <section className="flex flex-col bg-radial from-green-900 to-gray-950 to-95%  h-screen max-h-[calc(100vh-40px)] p-2">
-        <div className="py-6 w-1/2 max-w-md align-self-center mx-auto">
+      <section className="flex flex-col bg-radial from-green-900 to-gray-950 to-95%  h-screen max-h-[calc(100vh-56px)] p-2">
+        <div className="p-6 w-full max-w-md mx-auto">
           <Input
             className="bg-gray-800 text-gray-200 placeholder:text-gray-400"
             placeholder="Search for an artist..."
@@ -78,44 +81,38 @@ function Search() {
           />
         </div>
         {isLoading && <SkeletonSearch />}
-        {error && (
-          <div className="text-center text-gray-200 h-full flex items-center justify-center">
-            <p className="my-auto text-lg font-bold">{error.message}</p>
-          </div>
-        )}
-        {data?.artists.items.length === 0 && (
-          <div className="text-center text-gray-200 h-full flex items-center justify-center">
-            <p className="my-auto text-lg font-bold">No artists found</p>
-          </div>
-        )}
+        {error && <NoDataSearch />}
+        {data?.artists.items.length === 0 && <NoDataSearch />}
         {data?.artists.items.length > 0 && (
-          <ul className="flex flex-col items-center gap-8 overflow-y-auto px-2 py-3">
-            {data?.artists.items.map((artist: any) => (
-              <li key={artist.id} className="w-full max-w-md  rounded-md">
-                <Link
-                  to={`/artists/${artist.id}`}
-                  className="flex items-center  rounded-2xl transition-colors p-2 relative"
-                >
-                  <img
-                    className="aspect-square object-cover rounded-full absolute left-0 top-1/2 transform -translate-y-1/2"
-                    src={artist.images[2]?.url}
-                    alt={artist.name}
-                    width={120}
-                    height={120}
-                  />
-                  <div
-                    dir="rtl"
-                    className="w-100 font-semibold transition-colors hover:bg-green-900 text-gray-200  bg-gray-800 px-10 py-5 rounded-s-lg ml-20"
+          <ScrollArea className="h-[calc(100vh-160px)]">
+            <ul className="flex flex-col items-center gap-8  px-2 py-3">
+              {data?.artists.items.map((artist: any) => (
+                <li key={artist.id} className="w-full max-w-md  rounded-md">
+                  <Link
+                    to={`/artists/${artist.id}`}
+                    className="flex items-center  rounded-2xl transition-colors p-2 relative"
                   >
-                    <p>{artist.name}</p>
-                    <p className="text-sm font-normal text-gray-500">
-                      Followers: {artist.followers.total.toLocaleString()}
-                    </p>
-                  </div>
-                </Link>
-              </li>
-            ))}
-          </ul>
+                    <img
+                      className="aspect-square object-cover rounded-full absolute left-0 top-1/2 transform -translate-y-1/2 drop-shadow-lg drop-shadow-green-500/50"
+                      src={artist.images[2]?.url}
+                      alt={artist.name}
+                      width={120}
+                      height={120}
+                    />
+                    <div
+                      dir="rtl"
+                      className="w-100 font-semibold transition-colors hover:bg-green-900 text-gray-200  bg-gray-800 px-10 py-5 rounded-s-lg ml-20"
+                    >
+                      <p>{artist.name}</p>
+                      <p className="text-sm font-normal text-gray-500">
+                        Followers: {artist.followers.total.toLocaleString()}
+                      </p>
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </ScrollArea>
         )}
       </section>
     </>
