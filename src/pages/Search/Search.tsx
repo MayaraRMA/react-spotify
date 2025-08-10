@@ -50,8 +50,6 @@ function Search() {
     debouncedSave(clean);
   };
 
-  console.log(debouncedInputText);
-
   const { data, error, isLoading } = useQuery({
     queryKey: ["searchResults", debouncedInputText],
     queryFn: () => fetchPosts(context, debouncedInputText),
@@ -69,7 +67,7 @@ function Search() {
 
   return (
     <>
-      <section className="flex flex-col bg-radial from-green-900 to-gray-950 to-95%  h-screen max-h-[calc(100vh-41px)] ">
+      <section className="flex flex-col bg-radial from-green-900 to-gray-950 to-95%  h-screen max-h-[calc(100vh-40px)] p-2">
         <div className="py-6 w-1/2 max-w-md align-self-center mx-auto">
           <Input
             className="bg-gray-800 text-gray-200 placeholder:text-gray-400"
