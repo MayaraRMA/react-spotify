@@ -4,7 +4,6 @@ import {
   Link,
   Outlet,
 } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
 type RouterContext = {
   authContext?: AuthContext;
@@ -13,13 +12,21 @@ type RouterContext = {
 export const Route = createRootRouteWithContext<RouterContext>()({
   component: () => (
     <>
-      <div className="p-2 flex gap-2 bg-green-950">
-        <Link to="/search" className="[&.active]:font-bold ">
+      <nav className="p-2 flex gap-2 bg-green-950">
+        <Link
+          to="/"
+          className="[&.active]:font-bold hover:bg-green-800 p-2 rounded-md"
+        >
+          <p className="text-gray-200">Home</p>
+        </Link>
+        <Link
+          to="/search"
+          className="[&.active]:font-bold hover:bg-green-800 p-2 rounded-md"
+        >
           <p className="text-gray-200">Find Artists</p>
         </Link>
-      </div>
+      </nav>
       <Outlet />
-      <TanStackRouterDevtools />
     </>
   ),
 });
