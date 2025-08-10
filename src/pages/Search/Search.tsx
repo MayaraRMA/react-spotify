@@ -4,8 +4,9 @@ import type { AuthContext } from "@/hooks/useAuth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { useRouteContext } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import SkeletonSearch from "./SkeletonSearch";
+import debounce from "@/helpers/debouncer";
 
 async function fetchPosts(
   context: { authContext?: AuthContext },
@@ -33,26 +34,34 @@ function Search() {
   const queryClient = useQueryClient();
   const context = useRouteContext({ from: "__root__" });
   const [inputText, setInputText] = useState("");
+  const [debouncedInputText, setDebouncedInputText] = useState("");
+
+  const debouncedSave = useCallback(
+    debounce((nextValue: string) => setDebouncedInputText(nextValue), 500),
+    []
+  );
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputText(event.target.value);
+    debouncedSave(event.target.value);
   };
 
+  console.log(debouncedInputText);
+
   const { data, error, isLoading } = useQuery({
-    queryKey: ["searchResults", inputText],
-    queryFn: () => fetchPosts(context, inputText),
+    queryKey: ["searchResults", debouncedInputText],
+    queryFn: () => fetchPosts(context, debouncedInputText),
     staleTime: 10000, // 10 seconds
   });
 
   useEffect(() => {
-    if (inputText) {
+    if (debouncedInputText) {
       queryClient.fetchQuery({
-        queryKey: ["searchResults", inputText],
-        queryFn: () => fetchPosts(context, inputText),
+        queryKey: ["searchResults", debouncedInputText],
+        queryFn: () => fetchPosts(context, debouncedInputText),
       });
     }
-  }, [inputText, queryClient]);
-  console.log(isLoading);
+  }, [debouncedInputText, queryClient]);
 
   return (
     <>
