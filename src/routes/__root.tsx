@@ -13,19 +13,11 @@ type RouterContext = {
 export const Route = createRootRouteWithContext<RouterContext>()({
   component: () => (
     <>
-      <div className="p-2 flex gap-2">
-        <Link
-          to="/artists/$id"
-          params={{ id: "4Z8W4fKeB5YxbusRsdQVPb" }}
-          className="[&.active]:font-bold"
-        >
-          Artist
-        </Link>{" "}
-        <Link to="/search" className="[&.active]:font-bold">
-          Search
+      <div className="p-2 flex gap-2 bg-green-950">
+        <Link to="/search" className="[&.active]:font-bold ">
+          <p className="text-gray-200">Find Artists</p>
         </Link>
       </div>
-      <hr />
       <Outlet />
       <TanStackRouterDevtools />
     </>
