@@ -14,7 +14,10 @@ import {
 import { useEffect, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-async function fetchMusics(context: { authContext?: AuthContext }, id: string) {
+async function fetchMusics(
+  context: { authContext?: AuthContext },
+  id: string
+): Promise<ArtistTopTracksResponse> {
   const response = await fetch(
     `https://api.spotify.com/v1/artists/${id}/top-tracks`,
     {
@@ -33,7 +36,7 @@ async function fetchArtistAlbums(
   context: { authContext?: AuthContext },
   id: string,
   page: number
-) {
+): Promise<ArtistAlbumsResponse> {
   const response = await fetch(
     `https://api.spotify.com/v1/artists/${id}/albums?offset=${page}&limit=20`,
     {

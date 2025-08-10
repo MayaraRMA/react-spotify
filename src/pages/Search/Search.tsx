@@ -9,15 +9,24 @@ import { useCallback, useEffect, useState } from "react";
 import SkeletonSearch from "./components/SkeletonSearch";
 import debounce from "@/helpers/debouncer";
 import NoDataSearch from "./components/NoDataSearch";
-import { Scroll } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 async function fetchPosts(
   context: { authContext?: AuthContext },
   inputText: string
-) {
+): Promise<SearchResponse> {
   if (!inputText) {
-    return { artists: { items: [] } };
+    return {
+      artists: {
+        items: [],
+        total: 0,
+        limit: 0,
+        next: null,
+        offset: 0,
+        previous: null,
+        href: "",
+      },
+    };
   }
 
   const response = await fetch(
@@ -83,13 +92,14 @@ function Search() {
         {isLoading && <SkeletonSearch />}
         {error && <NoDataSearch />}
         {data?.artists.items.length === 0 && <NoDataSearch />}
-        {data?.artists.items.length > 0 && (
+        {data && data.artists.items.length > 0 && (
           <ScrollArea className="h-[calc(100vh-160px)]">
             <ul className="flex flex-col items-center gap-8  px-2 py-3">
-              {data?.artists.items.map((artist: any) => (
+              {data?.artists.items.map((artist) => (
                 <li key={artist.id} className="w-full max-w-md  rounded-md">
                   <Link
-                    to={`/artists/${artist.id}`}
+                    to="/artists/$id"
+                    params={{ id: artist.id }}
                     className="flex items-center  rounded-2xl transition-colors p-2 relative"
                   >
                     <img
