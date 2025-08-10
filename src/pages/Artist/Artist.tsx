@@ -5,12 +5,14 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   Pagination,
   PaginationContent,
+  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { useEffect, useState } from "react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 async function fetchMusics(context: { authContext?: AuthContext }, id: string) {
   const response = await fetch(
@@ -73,6 +75,26 @@ function Artist({ artist }: { artist: any }) {
   });
 
   const albumsPages = Math.ceil(dataAlbums?.total / 20) || 1;
+  const arrayToRender = Array.from(
+    { length: albumsPages },
+    (_, index) => index
+  );
+  const [cutPages, setCutPages] = useState<number[]>(arrayToRender.slice(0, 5));
+
+  const handleSlicePages = (newPage: number) => {
+    if (albumsPages <= 5) {
+      setCutPages(arrayToRender);
+    }
+    console.log("handleSlicePages", newPage, albumsPages);
+    const start = Math.max(0, newPage - 2);
+    const end = Math.min(albumsPages, start + 5);
+    setCutPages(arrayToRender.slice(start, end));
+  };
+
+  const handlePagesChange = (newPage: number) => {
+    setPage(newPage);
+    handleSlicePages(newPage);
+  };
 
   useEffect(() => {
     if (!isPlaceholderData && page < albumsPages - 1) {
@@ -83,19 +105,18 @@ function Artist({ artist }: { artist: any }) {
     }
   }, [isPlaceholderData, dataAlbums, page, queryClient]);
 
-  console.log(page);
   return (
-    <section className="bg-gray-900 text-white p-6">
-      <div className="flex items-center gap-6">
+    <section className="bg-gray-900 text-white flex flex-col items-center p-4 gap-4 min-h-[calc(100vh-40px)]">
+      <div className="flex flex-wrap gap-6 max-w-3xl w-full">
         <img
           className="rounded-md"
           src={artist.images[0]?.url}
           alt={artist.name}
-          width={240}
-          height={240}
+          width={200}
+          height={200}
         />
         <div>
-          <h1 className="text-2xl font-bold">{artist.name}</h1>
+          <h1 className="text-2xl font-bold mb-2">{artist.name}</h1>
           <p className="text-gray-400">
             <span className="font-bold">Popularity:</span> {artist.popularity}
           </p>
@@ -103,13 +124,15 @@ function Artist({ artist }: { artist: any }) {
             <span className="font-bold">Followers:</span>{" "}
             {artist.followers.total}
           </p>
-          <p className="text-gray-400">
-            <span className="font-bold">Genres:</span>{" "}
-            {artist.genres.join(", ")}
-          </p>
+          {artist.genres.length > 0 && (
+            <p className="text-gray-400">
+              <span className="font-bold">Genres:</span>{" "}
+              {artist.genres.join(", ")}
+            </p>
+          )}
         </div>
       </div>
-      <Tabs defaultValue="top-tracks" className="mt-6">
+      <Tabs defaultValue="top-tracks" className="w-full max-w-3xl">
         <TabsList className="bg-gray-900 w-full gap-1.5">
           <TabsTrigger
             className="text-gray-300"
@@ -131,81 +154,96 @@ function Artist({ artist }: { artist: any }) {
           {errorMusics && (
             <p>Error loading top tracks: {errorMusics.message}</p>
           )}
-          <ul className="pl-5 flex flex-col gap-4 my-3">
-            {dataMusics?.tracks.map((track: any) => (
-              <li
-                key={track.id}
-                className="flex items-center gap-4 bg-gray-800 rounded-md "
-              >
-                <img
-                  className="rounded-md"
-                  src={track.album.images[0]?.url}
-                  alt={track.name}
-                  width={60}
-                  height={60}
-                />
-                <div>
-                  <p className="text-gray-200 font-bold text-lg">
-                    {track.name}
-                  </p>
-                  <p className="text-gray-400 text-sm">
-                    Album: {track.album.name}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ul>
+          <ScrollArea className="h-96">
+            <ul className="flex flex-col gap-4 my-3">
+              {dataMusics?.tracks.map((track: any) => (
+                <li
+                  key={track.id}
+                  className="flex items-center gap-4 bg-gray-800 rounded-md "
+                >
+                  <img
+                    className="rounded-md"
+                    src={track.album.images[0]?.url}
+                    alt={track.name}
+                    width={60}
+                    height={60}
+                  />
+                  <div>
+                    <p className="text-gray-200 font-bold text-lg">
+                      {track.name}
+                    </p>
+                    <p className="text-gray-400 text-sm">
+                      Album: {track.album.name}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </ScrollArea>
         </TabsContent>
         <TabsContent value="albums">
           {isLoadingAlbums && <p>Loading albums...</p>}
           {errorAlbums && <p>Error loading albums: {errorAlbums.message}</p>}
-          <ul className="pl-5 flex flex-col gap-2 mt-3">
-            {dataAlbums?.items.map((album: any) => (
-              <li
-                key={album.id}
-                className="mb-2 flex items-center gap-4 bg-gray-800 rounded-md"
-              >
-                <img
-                  className="rounded-md"
-                  src={album.images[0]?.url}
-                  alt={album.name}
-                  width={60}
-                  height={60}
-                />
-                <div>
-                  <p className="text-gray-200 font-bold">{album.name}</p>
-                  <p className="text-gray-400 font-sm">
-                    Total tracks:{album.total_tracks}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ul>
-          <Pagination>
+          <ScrollArea className="h-96">
+            <ul className="flex flex-col gap-2 mt-3">
+              {dataAlbums?.items.map((album: any) => (
+                <li
+                  key={album.id}
+                  className="mb-2 flex items-center gap-4 bg-gray-800 rounded-md"
+                >
+                  <img
+                    className="rounded-md"
+                    src={album.images[0]?.url}
+                    alt={album.name}
+                    width={60}
+                    height={60}
+                  />
+                  <div>
+                    <p className="text-gray-200 font-bold">{album.name}</p>
+                    <p className="text-gray-400 font-sm">
+                      Total tracks:{album.total_tracks}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </ScrollArea>
+          <Pagination className="mt-4">
             <PaginationContent>
               <PaginationItem>
                 <PaginationPrevious
-                  onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
+                  onClick={() => handlePagesChange(Math.max(page - 1, 0))}
                   hidden={page === 0}
                   className="hover:bg-gray-800 cursor-pointer"
                 />
               </PaginationItem>
-              {albumsPages > 1 &&
-                Array.from({ length: albumsPages }, (_, index) => (
-                  <PaginationItem key={index}>
-                    <PaginationLink
-                      isActive={index === page}
-                      onClick={() => setPage(index)}
-                      className="hover:bg-gray-800 cursor-pointer"
-                    >
-                      {index + 1}
-                    </PaginationLink>
+
+              {cutPages.map((item) => (
+                <PaginationItem key={item}>
+                  <PaginationLink
+                    isActive={item === page}
+                    onClick={() => handlePagesChange(item)}
+                    className="hover:bg-gray-800 cursor-pointer"
+                  >
+                    {item + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              {page < albumsPages - 5 && (
+                <>
+                  <PaginationItem>
+                    <PaginationEllipsis
+                      onClick={() =>
+                        handlePagesChange(Math.min(page + 10, albumsPages - 1))
+                      }
+                    />
                   </PaginationItem>
-                ))}
+                </>
+              )}
               <PaginationItem>
                 <PaginationNext
                   onClick={() =>
-                    setPage((old) => (dataAlbums?.next ? old + 1 : old))
+                    handlePagesChange(Math.min(page + 1, albumsPages - 1))
                   }
                   hidden={page === albumsPages - 1}
                   className="hover:bg-gray-800 cursor-pointer"
