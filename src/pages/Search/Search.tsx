@@ -96,7 +96,7 @@ function Search() {
           <ScrollArea className="h-[calc(100vh-160px)]">
             <ul className="flex flex-col items-center gap-8  px-2 py-3">
               {data?.artists.items.map((artist) => (
-                <li key={artist.id} className="w-full max-w-md  rounded-md">
+                <li key={artist.id} className="w-full max-w-md rounded-md">
                   <Link
                     to="/artists/$id"
                     params={{ id: artist.id }}
