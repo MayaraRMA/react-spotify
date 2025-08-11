@@ -30,7 +30,7 @@ async function fetchPosts(
   }
 
   const response = await fetch(
-    `https://api.spotify.com/v1/search?q=${inputText}&type=artist`,
+    `https://api.spotify.com/v1/search?q=${inputText}&type=album%2Cartist`,
     {
       headers: {
         Authorization: `Bearer ${context.authContext?.token}`,
